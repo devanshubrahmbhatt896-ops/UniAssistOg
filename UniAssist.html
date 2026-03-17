@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UniAssist – Smart College Help Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --p:#8b5cf6;--p2:#6d28d9;--p3:#4f46e5;--a:#22d3ee;--a2:#f472b6;
+  --bg:#0d0b1e;--text:#f1f5f9;--sub:#cbd5e1;--muted:#94a3b8;
+  --gl:rgba(255,255,255,.06);--gl2:rgba(255,255,255,.11);
+  --gb:rgba(255,255,255,.10);--gb2:rgba(255,255,255,.18);
+  --sh:0 8px 32px rgba(0,0,0,.30);
+  --nav-h:64px;--tab-h:52px;
+}
+body.light{
+  --bg:#f0ebff;--text:#1e1b4b;--sub:#3730a3;--muted:#64748b;
+  --gl:rgba(255,255,255,.60);--gl2:rgba(255,255,255,.80);
+  --gb:rgba(109,40,217,.16);--gb2:rgba(109,40,217,.28);
+  --sh:0 8px 32px rgba(109,40,217,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  transition:background .4s,color .4s;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 10% 15%,rgba(109,40,217,.28),transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 80%,rgba(34,211,238,.16),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 60% 5%, rgba(244,114,182,.13),transparent 55%),
+    radial-gradient(ellipse 40% 35% at 85% 25%,rgba(79,70,229,.10),transparent 50%);
+  animation:bgDrift 20s ease-in-out infinite alternate;
+}
+body.light::before{
+  background:
+    radial-gradient(ellipse 70% 55% at 10% 15%,rgba(139,92,246,.14),transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 80%,rgba(34,211,238,.09),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 60% 5%, rgba(244,114,182,.08),transparent 55%);
+}
+@keyframes bgDrift{
+  0%  {transform:scale(1)    translateX(0)    translateY(0);}
+  50% {transform:scale(1.04) translateX(10px) translateY(-8px);}
+  100%{transform:scale(1.02) translateX(-8px) translateY(10px);}
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:30px 30px;
+}
+body.light::after{background-image:radial-gradient(rgba(109,40,217,.045) 1px,transparent 1px);}
+
+/* ── NAV ── */
+.navbar{position:sticky;top:0;z-index:500;height:var(--nav-h);background:rgba(13,11,30,.82);border-bottom:1px solid rgba(139,92,246,.20);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);transition:background .4s,border-color .4s;}
+body.light .navbar{background:rgba(240,235,255,.88);border-color:rgba(109,40,217,.18);}
+.nav-inner{max-width:1140px;margin:0 auto;padding:0 1.5rem;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.logo{display:flex;align-items:center;gap:.7rem;cursor:pointer;flex-shrink:0;}
+.logo-mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--p2),var(--a));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;box-shadow:0 0 18px rgba(109,40,217,.42);transition:box-shadow .3s;}
+.logo:hover .logo-mark{box-shadow:0 0 28px rgba(109,40,217,.62);}
+.logo-text h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;background:linear-gradient(90deg,#fff,var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+body.light .logo-text h1{background:linear-gradient(90deg,var(--p2),var(--p3));-webkit-background-clip:text;background-clip:text;}
+.logo-text p{font-size:.62rem;color:var(--muted);letter-spacing:.04em;}
+.nav-right{display:flex;align-items:center;gap:.4rem;}
+.sos-btn{padding:.4rem .9rem;border-radius:9px;background:linear-gradient(135deg,#dc2626,#f43f5e);color:#fff;border:none;cursor:pointer;font-size:.8rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 3px 12px rgba(220,38,38,.33);transition:all .22s;white-space:nowrap;}
+.sos-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(220,38,38,.50);}
+#darkBtn{width:36px;height:36px;border-radius:50%;background:var(--gl);border:1px solid var(--gb);color:var(--text);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .22s;}
+#darkBtn:hover{background:var(--gl2);transform:rotate(22deg);}
+
+/* ── TABS ── */
+.tabbar{position:sticky;top:var(--nav-h);z-index:450;height:var(--tab-h);background:rgba(13,11,30,.75);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-x:auto;scrollbar-width:none;transition:background .4s;}
+body.light .tabbar{background:rgba(240,235,255,.80);border-color:rgba(109,40,217,.10);}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab-inner{max-width:1140px;margin:0 auto;padding:0 1rem;height:var(--tab-h);display:flex;align-items:center;gap:.25rem;min-width:max-content;}
+.tab{padding:.42rem 1.1rem;border-radius:9px;font-size:.83rem;font-weight:500;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .22s;white-space:nowrap;position:relative;}
+.tab::after{content:'';position:absolute;bottom:-1px;left:50%;right:50%;height:2px;background:linear-gradient(90deg,var(--p),var(--a));border-radius:2px;transition:all .3s cubic-bezier(.22,1,.36,1);}
+.tab:hover{color:var(--text);background:rgba(255,255,255,.06);}
+.tab.active{color:var(--text);background:rgba(109,40,217,.18);border-color:rgba(139,92,246,.35);}
+.tab.active::after{left:15%;right:15%;}
+body.light .tab{color:var(--muted);}
+body.light .tab:hover{background:rgba(109,40,217,.06);color:var(--p2);}
+body.light .tab.active{background:rgba(109,40,217,.12);border-color:rgba(109,40,217,.25);color:var(--p2);}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;animation:pageIn .45s cubic-bezier(.22,1,.36,1);}
+@keyframes pageIn{from{opacity:0;transform:translateY(18px);filter:blur(4px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
+main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem 5rem;position:relative;z-index:1;}
+
+/* ── HEADINGS ── */
+.pg-hd{margin-bottom:2rem;}
+.pg-hd h2{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;background:linear-gradient(100deg,#fff 30%,var(--p) 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;}
+body.light .pg-hd h2{background:linear-gradient(100deg,var(--p2) 20%,var(--p3) 80%);-webkit-background-clip:text;background-clip:text;}
+.pg-hd p{color:var(--muted);margin-top:.4rem;font-size:.92rem;}
+
+/* ── CARD ── */
+.card{background:var(--gl);border:1px solid var(--gb);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);border-radius:18px;padding:1.8rem;margin-bottom:1.75rem;box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.07);transition:border-color .3s,box-shadow .3s,background .4s;}
+.card:hover{border-color:var(--gb2);box-shadow:var(--sh),0 0 28px rgba(109,40,217,.09);}
+.card-ttl{font-family:'Syne',sans-serif;font-weight:700;font-size:1.06rem;color:var(--text);margin-bottom:1.35rem;display:flex;align-items:center;gap:.5rem;}
+
+/* ── FORM ── */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:560px){.fgrid{grid-template-columns:1fr;}}
+.fg{margin-bottom:1rem;}
+.fl{display:block;font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em;}
+.fi{width:100%;padding:.68rem .95rem;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:10px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;outline:none;resize:vertical;transition:border-color .2s,background .2s,box-shadow .2s;}
+body.light .fi{background:rgba(255,255,255,.65);border-color:rgba(109,40,217,.18);color:var(--text);}
+.fi::placeholder{color:rgba(255,255,255,.22);}
+body.light .fi::placeholder{color:rgba(30,27,75,.28);}
+.fi:focus{border-color:rgba(139,92,246,.55);background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(109,40,217,.13);}
+body.light .fi:focus{background:rgba(255,255,255,.90);}
+.fi option{background:#1a1030;color:#f1f5f9;}
+.fsub{width:100%;padding:.84rem;background:linear-gradient(135deg,var(--p2),var(--p3),var(--a));color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.96rem;cursor:pointer;letter-spacing:.02em;transition:all .26s;box-shadow:0 4px 18px rgba(109,40,217,.36);position:relative;overflow:hidden;}
+.fsub::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.12);opacity:0;transition:opacity .25s;}
+.fsub:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(109,40,217,.50);}
+.fsub:hover::before{opacity:1;}
+.fsub:active{transform:translateY(0);}
+.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.3rem;flex-wrap:wrap;gap:.75rem;}
+.sec-ttl{font-family:'Syne',sans-serif;font-weight:700;font-size:1.25rem;color:var(--text);}
+.frow{display:flex;gap:.4rem;flex-wrap:wrap;}
+.fb{padding:.33rem .85rem;border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+body.light .fb{background:rgba(255,255,255,.55);border-color:rgba(109,40,217,.14);}
+.fb:hover{color:var(--text);background:rgba(255,255,255,.09);}
+.fb.on{background:rgba(109,40,217,.22);border-color:rgba(139,92,246,.42);color:var(--p);}
+body.light .fb.on{color:var(--p2);background:rgba(109,40,217,.12);}
+
+/* ── ITEMS GRID ── */
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem;}
+.ic{background:var(--gl);border:1px solid var(--gb);border-radius:16px;padding:1.35rem;backdrop-filter:blur(18px);transition:all .32s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;}
+.ic::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.ic.lost::before{background:linear-gradient(90deg,#ef4444,#f97316);}
+.ic.found::before{background:linear-gradient(90deg,#10b981,#22d3ee);}
+.ic:hover{transform:translateY(-5px) scale(1.01);border-color:var(--gb2);box-shadow:0 18px 45px rgba(0,0,0,.26);}
+.ic-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem;}
+.ic h3{font-family:'Syne',sans-serif;font-weight:700;font-size:.96rem;color:var(--text);margin-bottom:.6rem;}
+.imeta{display:flex;flex-direction:column;gap:.28rem;}
+.imeta span{font-size:.8rem;color:var(--muted);}
+.bdg{display:inline-flex;padding:.16rem .65rem;border-radius:999px;font-size:.64rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.bdg-lost{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.28);}
+.bdg-found{background:rgba(16,185,129,.18);color:#6ee7b7;border:1px solid rgba(16,185,129,.28);}
+.delbtn{width:26px;height:26px;border-radius:50%;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.20);color:#fca5a5;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.delbtn:hover{background:rgba(239,68,68,.28);transform:scale(1.1);}
+.empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--muted);}
+.empty-ico{font-size:3rem;margin-bottom:.8rem;opacity:.4;}
+.empty h3{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--text);margin-bottom:.35rem;}
+.empty p{font-size:.84rem;}
+
+/* ── COMPLAINTS ── */
+.cc{background:var(--gl);border:1px solid var(--gb);border-left:3px solid var(--p);border-radius:14px;padding:1.3rem;backdrop-filter:blur(16px);transition:all .25s;margin-bottom:.9rem;}
+.cc:hover{background:var(--gl2);border-color:var(--gb2);}
+.cc-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.7rem;}
+.cc h4{font-family:'Syne',sans-serif;font-weight:700;color:var(--text);margin-bottom:.4rem;}
+.cc p{font-size:.83rem;color:var(--muted);line-height:1.58;margin-bottom:.7rem;}
+.cc-ft{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.25);}
+body.light .cc-ft{color:rgba(30,27,75,.28);}
+.cbdg{display:inline-flex;padding:.16rem .65rem;border-radius:999px;font-size:.63rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.cf{background:rgba(59,130,246,.18);color:#93c5fd;border:1px solid rgba(59,130,246,.28);}
+.ca{background:rgba(234,179,8,.18);color:#fde047;border:1px solid rgba(234,179,8,.28);}
+.cs{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.28);}
+.ch{background:rgba(236,72,153,.18);color:#f9a8d4;border:1px solid rgba(236,72,153,.28);}
+.co{background:rgba(139,92,246,.18);color:#c4b5fd;border:1px solid rgba(139,92,246,.28);}
+.anon-box{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.20);border-radius:10px;padding:.78rem 1rem;font-size:.81rem;color:#fde047;margin-bottom:1.1rem;}
+body.light .anon-box{background:rgba(234,179,8,.10);}
+.tog-bar{display:flex;justify-content:space-between;align-items:center;}
+.tog-btn{padding:.38rem .88rem;border-radius:8px;background:var(--gl);border:1px solid var(--gb);color:var(--text);font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+.tog-btn:hover{background:var(--gl2);}
+
+/* ── EMERGENCY ── */
+.pulse-banner{background:rgba(220,38,38,.09);border:1px solid rgba(220,38,38,.25);border-radius:16px;padding:1.15rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;animation:sosGlow 2.5s ease-in-out infinite;}
+@keyframes sosGlow{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0);}50%{box-shadow:0 0 0 8px rgba(220,38,38,.09);}}
+.pulse-banner h3{font-family:'Syne',sans-serif;font-weight:700;color:#fca5a5;margin-bottom:.18rem;}
+.pulse-banner p{font-size:.81rem;color:rgba(252,165,165,.68);}
+body.light .pulse-banner h3{color:#dc2626;}
+body.light .pulse-banner p{color:rgba(220,38,38,.65);}
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.35rem;margin-bottom:2rem;}
+.ec{background:var(--gl);border:1px solid var(--gb);border-radius:20px;padding:1.6rem;backdrop-filter:blur(22px);transition:all .32s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;}
+.ec::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 20%,rgba(255,255,255,.04),transparent 55%);pointer-events:none;}
+.ec:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 52px rgba(0,0,0,.28);border-color:var(--gb2);}
+.eico{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:.95rem;}
+.ec h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.02rem;color:var(--text);margin-bottom:.2rem;}
+.ec p{font-size:.78rem;color:var(--muted);margin-bottom:1.15rem;}
+.cbtn{display:block;width:100%;padding:.7rem;border-radius:11px;text-align:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.86rem;color:#fff;text-decoration:none;transition:all .24s;}
+.cbtn:hover{transform:scale(1.02);filter:brightness(1.1);}
+.c-red{background:linear-gradient(135deg,#dc2626,#f43f5e);box-shadow:0 4px 14px rgba(220,38,38,.33);}
+.c-blue{background:linear-gradient(135deg,#1d4ed8,#38bdf8);box-shadow:0 4px 14px rgba(29,78,216,.33);}
+.c-orange{background:linear-gradient(135deg,#c2410c,#f97316);box-shadow:0 4px 14px rgba(194,65,12,.33);}
+.c-pink{background:linear-gradient(135deg,#9d174d,#f472b6);box-shadow:0 4px 14px rgba(157,23,77,.33);}
+.c-purple{background:linear-gradient(135deg,#5b21b6,#8b5cf6);box-shadow:0 4px 14px rgba(91,33,182,.33);}
+.c-green{background:linear-gradient(135deg,#065f46,#10b981);box-shadow:0 4px 14px rgba(6,95,70,.33);}
+.notice-box{background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.20);border-radius:15px;padding:1.15rem 1.45rem;display:flex;gap:.85rem;}
+.notice-box span{font-size:1.2rem;flex-shrink:0;margin-top:.1rem;}
+
+/* ── CHAT ── */
+.chat-outer{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:1rem;height:calc(100vh - var(--nav-h) - var(--tab-h) - 4rem);min-height:400px;}
+.chat-hd{flex-shrink:0;display:flex;align-items:center;gap:.9rem;background:var(--gl);border:1px solid var(--gb);backdrop-filter:blur(22px);border-radius:16px;padding:.95rem 1.3rem;box-shadow:var(--sh);}
+.bot-av{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#6d28d9,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;box-shadow:0 3px 16px rgba(109,40,217,.38);position:relative;}
+.bot-av::after{content:'';position:absolute;bottom:3px;right:3px;width:10px;height:10px;border-radius:50%;background:#10b981;border:2px solid var(--bg);}
+.bot-info{flex:1;min-width:0;}
+.bot-info h2{font-family:'Syne',sans-serif;font-weight:800;font-size:.98rem;background:linear-gradient(90deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+body.light .bot-info h2{background:linear-gradient(90deg,var(--p2),var(--p3));-webkit-background-clip:text;background-clip:text;}
+.bot-info p{font-size:.7rem;color:var(--muted);}
+.clr-btn{margin-left:auto;padding:.35rem .85rem;border-radius:8px;background:var(--gl);border:1px solid var(--gb);color:var(--muted);font-size:.74rem;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;flex-shrink:0;}
+.clr-btn:hover{background:var(--gl2);color:var(--text);}
+#chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.8rem;padding:.4rem .2rem;scroll-behavior:smooth;min-height:0;}
+#chat-msgs::-webkit-scrollbar{width:4px;}
+#chat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.10);border-radius:99px;}
+.chat-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;text-align:center;padding:1.5rem 1rem;flex:1;}
+.welcome-emoji{font-size:2.8rem;}
+.chat-welcome h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1.28rem;background:linear-gradient(90deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+body.light .chat-welcome h3{background:linear-gradient(90deg,var(--p2),var(--p3));-webkit-background-clip:text;background-clip:text;}
+.chat-welcome p{font-size:.86rem;color:var(--muted);max-width:380px;}
+.wchips{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:center;margin-top:.3rem;}
+.chip{padding:.38rem .9rem;border-radius:999px;background:var(--gl);border:1px solid var(--gb);color:var(--sub);font-size:.78rem;cursor:pointer;transition:all .22s;font-family:'Plus Jakarta Sans',sans-serif;}
+.chip:hover{background:rgba(109,40,217,.20);border-color:rgba(139,92,246,.38);color:var(--text);transform:translateY(-2px);}
+body.light .chip{background:rgba(255,255,255,.60);color:var(--p2);}
+.cmsg{display:flex;gap:.6rem;animation:msgIn .28s cubic-bezier(.22,1,.36,1);max-width:80%;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.cmsg.user{flex-direction:row-reverse;align-self:flex-end;}
+.cmsg.bot{align-self:flex-start;}
+.mav{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;align-self:flex-end;}
+.cmsg.bot .mav{background:linear-gradient(135deg,#6d28d9,#22d3ee);box-shadow:0 2px 10px rgba(109,40,217,.28);}
+.cmsg.user .mav{background:var(--gl);border:1px solid var(--gb);}
+.mbub{padding:.75rem 1rem;border-radius:15px;font-size:.86rem;line-height:1.62;max-width:100%;}
+.cmsg.bot .mbub{background:var(--gl);border:1px solid var(--gb);border-bottom-left-radius:4px;color:var(--text);}
+.cmsg.user .mbub{background:linear-gradient(135deg,rgba(109,40,217,.33),rgba(34,211,238,.17));border:1px solid rgba(139,92,246,.26);border-bottom-right-radius:4px;color:var(--text);}
+body.light .cmsg.bot .mbub{background:rgba(255,255,255,.70);border-color:rgba(109,40,217,.13);}
+.mbub p{margin:0 0 .45rem;}
+.mbub p:last-child{margin-bottom:0;}
+.mbub ul{margin:.35rem 0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.2rem;}
+.mbub strong{color:#ddd6fe;}
+body.light .mbub strong{color:var(--p2);}
+.typing-dots{display:flex;gap:4px;align-items:center;padding:.2rem 0;}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--p);animation:tdot 1.3s ease-in-out infinite;}
+.typing-dots span:nth-child(2){animation-delay:.2s;}
+.typing-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-6px);opacity:1;}}
+.chat-input-row{flex-shrink:0;background:var(--gl);border:1px solid var(--gb);backdrop-filter:blur(22px);border-radius:15px;padding:.85rem 1rem;display:flex;gap:.65rem;align-items:flex-end;box-shadow:var(--sh);}
+#ci{flex:1;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:.65rem .9rem;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.87rem;resize:none;outline:none;max-height:100px;overflow-y:auto;transition:border-color .2s;line-height:1.5;}
+body.light #ci{background:rgba(255,255,255,.65);border-color:rgba(109,40,217,.18);color:var(--text);}
+#ci::placeholder{color:rgba(255,255,255,.22);}
+body.light #ci::placeholder{color:rgba(30,27,75,.28);}
+#ci:focus{border-color:rgba(139,92,246,.50);}
+#sb{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6d28d9,#22d3ee);color:#fff;border:none;cursor:pointer;font-size:1.05rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(109,40,217,.38);transition:all .2s;}
+#sb:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(109,40,217,.54);}
+#sb:disabled{opacity:.36;transform:none;cursor:not-allowed;}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:80px;right:1.2rem;z-index:9999;padding:.72rem 1.1rem;border-radius:12px;font-size:.82rem;font-weight:500;backdrop-filter:blur(18px);display:flex;align-items:center;gap:.4rem;box-shadow:0 8px 24px rgba(0,0,0,.24);animation:tin .3s cubic-bezier(.22,1,.36,1);pointer-events:none;}
+.tok{background:rgba(16,185,129,.20);border:1px solid rgba(16,185,129,.32);color:#6ee7b7;}
+.terr{background:rgba(239,68,68,.20);border:1px solid rgba(239,68,68,.32);color:#fca5a5;}
+@keyframes tin{from{opacity:0;transform:translateX(18px);}to{opacity:1;transform:translateX(0);}}
+
+/* ── TRANSITION OVERLAY ── */
+#ua-overlay{position:fixed;inset:0;z-index:8000;pointer-events:none;display:grid;grid-template-rows:repeat(5,1fr);}
+.ua-stripe{will-change:transform;}
+.ua-stripe:nth-child(1){background:linear-gradient(90deg,#6d28d9,#5b21b6);}
+.ua-stripe:nth-child(2){background:linear-gradient(90deg,#4f46e5,#6d28d9);}
+.ua-stripe:nth-child(3){background:linear-gradient(90deg,#7c3aed,#4f46e5);}
+.ua-stripe:nth-child(4){background:linear-gradient(90deg,#22d3ee,#7c3aed);}
+.ua-stripe:nth-child(5){background:linear-gradient(90deg,#f472b6,#22d3ee);}
+#ua-logo-mid{
+  position:fixed;top:50%;left:50%;
+  z-index:8100;pointer-events:none;
+  width:90px;height:90px;border-radius:24px;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(14px);
+  border:1.5px solid rgba(255,255,255,.28);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:2.2rem;color:#fff;
+  box-shadow:0 0 60px rgba(139,92,246,.55),0 0 120px rgba(34,211,238,.20);
+  /* hidden by default — GSAP controls visibility */
+  transform:translate(-50%,-50%) scale(0);
+  opacity:0;
+}
+.ua-particle{position:fixed;border-radius:50%;pointer-events:none;z-index:7999;}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;background:rgba(0,0,0,.18);border-top:1px solid rgba(255,255,255,.06);padding:1.1rem;text-align:center;font-size:.74rem;color:rgba(255,255,255,.20);transition:background .4s;}
+body.light footer{background:rgba(109,40,217,.04);border-color:rgba(109,40,217,.09);color:rgba(30,27,75,.28);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){main{padding:1.75rem 1.25rem 4rem;}.egrid{grid-template-columns:1fr 1fr;}.igrid{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){
+  :root{--nav-h:58px;--tab-h:48px;}
+  .logo-text p{display:none;}.sos-btn{display:none;}
+  main{padding:1.4rem 1rem 4rem;}.pg-hd h2{font-size:1.65rem;}.card{padding:1.35rem;}
+  .egrid{grid-template-columns:1fr 1fr;}.igrid{grid-template-columns:1fr;}
+  .tab{padding:.38rem .8rem;font-size:.76rem;}.cmsg{max-width:92%;}
+  .chat-outer{height:calc(100vh - var(--nav-h) - var(--tab-h) - 2rem);}
+}
+@media(max-width:420px){.egrid{grid-template-columns:1fr;}.nav-right #darkBtn{width:32px;height:32px;font-size:.9rem;}}
+</style>
+</head>
+<body>
+
+<div id="ua-overlay">
+  <div class="ua-stripe"></div>
+  <div class="ua-stripe"></div>
+  <div class="ua-stripe"></div>
+  <div class="ua-stripe"></div>
+  <div class="ua-stripe"></div>
+</div>
+<div id="ua-logo-mid">U</div>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="logo" id="logo-home">
+      <div class="logo-mark">U</div>
+      <div class="logo-text"><h1>UniAssist</h1><p>Smart College Help Portal</p></div>
+    </div>
+    <div class="nav-right">
+      <button class="sos-btn" id="sos-btn">🚨 SOS</button>
+      <button id="darkBtn" title="Toggle theme">☀️</button>
+    </div>
+  </div>
+</nav>
+
+<div class="tabbar">
+  <div class="tab-inner">
+    <button class="tab active" id="tab-lf">📦 Lost &amp; Found</button>
+    <button class="tab" id="tab-cp">📝 Complaints</button>
+    <button class="tab" id="tab-em">🚨 Emergency</button>
+    <button class="tab" id="tab-ai">🤖 AI Chat</button>
+  </div>
+</div>
+
+<main>
+  <!-- LOST & FOUND -->
+  <div class="page active" id="page-lf">
+    <div class="pg-hd"><h2>Lost &amp; Found</h2><p>Help your peers find their lost items or return found items</p></div>
+    <div class="card">
+      <div class="card-ttl">📦 Post an Item</div>
+      <form id="lf-form">
+        <div class="fgrid">
+          <div class="fg"><label class="fl">Item Type</label><select id="lf-type" class="fi" required><option value="lost">Lost Item</option><option value="found">Found Item</option></select></div>
+          <div class="fg"><label class="fl">Item Name</label><input id="lf-name" type="text" class="fi" placeholder="e.g., Blue Water Bottle" required/></div>
+        </div>
+        <div class="fgrid">
+          <div class="fg"><label class="fl">Location</label><input id="lf-loc" type="text" class="fi" placeholder="e.g., Library 2nd Floor" required/></div>
+          <div class="fg"><label class="fl">Contact</label><input id="lf-con" type="text" class="fi" placeholder="Phone or Email" required/></div>
+        </div>
+        <div class="fg"><label class="fl">Description (Optional)</label><textarea id="lf-desc" class="fi" rows="3" placeholder="Additional details..."></textarea></div>
+        <button type="submit" class="fsub">✨ Post Item</button>
+      </form>
+    </div>
+    <div class="fg" style="margin-bottom:1.3rem;"><input id="lf-search" type="text" class="fi" placeholder="🔍 Search items by name or location..."/></div>
+    <div class="sec-hd">
+      <div class="sec-ttl">Recent Items</div>
+      <div class="frow">
+        <button class="fb on" id="f-all"   onclick="setF('all')">All</button>
+        <button class="fb"    id="f-lost"  onclick="setF('lost')">Lost</button>
+        <button class="fb"    id="f-found" onclick="setF('found')">Found</button>
+      </div>
+    </div>
+    <div id="items-grid" class="igrid"></div>
+  </div>
+
+  <!-- COMPLAINTS -->
+  <div class="page" id="page-cp">
+    <div class="pg-hd"><h2>Anonymous Complaint Box</h2><p>Submit concerns anonymously — your identity is completely protected</p></div>
+    <div class="card">
+      <div class="card-ttl">📝 Submit a Complaint</div>
+      <form id="comp-form">
+        <div class="fg"><label class="fl">Category</label>
+          <select id="cc" class="fi" required>
+            <option value="">Select Category</option>
+            <option value="facilities">Facilities &amp; Infrastructure</option>
+            <option value="academic">Academic Issues</option>
+            <option value="safety">Safety &amp; Security</option>
+            <option value="harassment">Harassment / Bullying</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Subject</label><input id="cs" type="text" class="fi" placeholder="Brief subject of your complaint" required/></div>
+        <div class="fg"><label class="fl">Complaint Details</label><textarea id="cd" class="fi" rows="5" placeholder="Describe your complaint in detail..." required></textarea></div>
+        <div class="anon-box">🔒 Your complaint is submitted anonymously. No identifying information is stored.</div>
+        <button type="submit" class="fsub">🔒 Submit Anonymously</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="tog-bar">
+        <div class="card-ttl" style="margin-bottom:0;">📋 Submitted Complaints</div>
+        <button class="tog-btn" id="tog-btn">Show</button>
+      </div>
+      <div id="comp-view" style="display:none;margin-top:1.25rem;"><div id="comp-list"></div></div>
+    </div>
+  </div>
+
+  <!-- EMERGENCY -->
+  <div class="page" id="page-em">
+    <div class="pg-hd"><h2>Emergency Contacts</h2><p>Quick access to essential emergency services — stay calm, act fast</p></div>
+    <div class="pulse-banner">
+      <span style="font-size:2rem;flex-shrink:0;">🆘</span>
+      <div><h3>Emergency? Call Immediately</h3><p>Tap any card to call. Give your name, exact location, and situation clearly.</p></div>
+    </div>
+    <div class="egrid">
+      <div class="ec" style="border-top:3px solid #ef4444;"><div class="eico" style="background:rgba(239,68,68,.15);">🚑</div><h3>Ambulance</h3><p>Medical Emergency · 24/7</p><a href="tel:108" class="cbtn c-red">📞 Call 108</a></div>
+      <div class="ec" style="border-top:3px solid #3b82f6;"><div class="eico" style="background:rgba(59,130,246,.15);">🚓</div><h3>Police</h3><p>Security Emergency · 24/7</p><a href="tel:100" class="cbtn c-blue">📞 Call 100</a></div>
+      <div class="ec" style="border-top:3px solid #f97316;"><div class="eico" style="background:rgba(249,115,22,.15);">🚒</div><h3>Fire Service</h3><p>Fire Emergency · 24/7</p><a href="tel:101" class="cbtn c-orange">📞 Call 101</a></div>
+      <div class="ec" style="border-top:3px solid #ec4899;"><div class="eico" style="background:rgba(236,72,153,.15);">👩</div><h3>Women Helpline</h3><p>24/7 Support &amp; Assistance</p><a href="tel:181" class="cbtn c-pink">📞 Call 181</a></div>
+      <div class="ec" style="border-top:3px solid #8b5cf6;"><div class="eico" style="background:rgba(139,92,246,.15);">🏫</div><h3>Campus Security</h3><p>On-Campus Help · Always On</p><a href="tel:9999999999" class="cbtn c-purple">📞 Call Security</a></div>
+      <div class="ec" style="border-top:3px solid #10b981;"><div class="eico" style="background:rgba(16,185,129,.15);">🏥</div><h3>Medical Room</h3><p>First Aid · Campus Health</p><a href="tel:9999999998" class="cbtn c-green">📞 Call Medical</a></div>
+    </div>
+    <div class="notice-box"><span>⚠️</span><div><h4 style="font-family:'Syne',sans-serif;font-weight:700;color:#fde047;margin-bottom:.25rem;">Stay Calm — You Are Not Alone</h4><p style="font-size:.82rem;color:rgba(253,224,71,.70);line-height:1.55;">In any emergency call immediately. State your name, exact location, and nature of emergency clearly. Campus staff are trained to help you.</p></div></div>
+  </div>
+
+  <!-- AI CHAT -->
+  <div class="page" id="page-ai">
+    <div class="chat-outer">
+      <div class="chat-hd">
+        <div class="bot-av">🤖</div>
+        <div class="bot-info"><h2>UniAssist AI</h2><p>Free AI assistant · No login needed · Always ready</p></div>
+        <button class="clr-btn" id="clr-btn">🗑 Clear</button>
+      </div>
+      <div id="chat-msgs"></div>
+      <div class="chat-input-row">
+        <textarea id="ci" placeholder="Ask anything... (Enter to send)" rows="1"></textarea>
+        <button id="sb">➤</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>&copy; 2026 UniAssist — Made with ❤️ for students</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/* ══ DARK MODE ══ */
+(function(){
+  var t=localStorage.getItem('ua_theme')||'dark';
+  if(t==='light') document.body.classList.add('light');
+  function setIcon(){var b=document.getElementById('darkBtn');if(b)b.textContent=document.body.classList.contains('light')?'🌙':'☀️';}
+  setIcon();
+  document.getElementById('darkBtn').addEventListener('click',function(){
+    document.body.classList.toggle('light');
+    localStorage.setItem('ua_theme',document.body.classList.contains('light')?'light':'dark');
+    setIcon();
+  });
+})();
+
+/* ══ TRANSITIONS ══ */
+var stripes, logoMid, transitioning=false;
+
+function initTransitions(){
+  stripes = document.querySelectorAll('.ua-stripe');
+  logoMid = document.getElementById('ua-logo-mid');
+}
+
+/* Called every tab switch: stripes sweep IN (cover), logo spins, stripes sweep OUT (reveal) */
+function playTransition(cb){
+  if(transitioning) return;
+  transitioning = true;
+
+  /* Reset stripe origins for sweep-IN from left */
+  gsap.set(stripes, {scaleX:0, transformOrigin:'left center'});
+  gsap.set(logoMid, {scale:0, opacity:0, rotation:-180, xPercent:-50, yPercent:-50});
+
+  var tl = gsap.timeline({
+    onComplete: function(){
+      transitioning = false;
+      if(cb) cb();
+    }
+  });
+
+  /* 1. Stripes sweep IN (left→right), staggered */
+  tl.to(stripes, {
+    scaleX: 1,
+    duration: .44,
+    ease: 'power3.inOut',
+    stagger: {amount:.16, from:'start'}
+  });
+
+  /* 2. Logo pops in with spin while covered */
+  tl.to(logoMid, {
+    scale: 1, opacity: 1, rotation: 0,
+    duration: .32, ease: 'back.out(2)'
+  }, '-=.20');
+
+  /* 3. Page swap happens here (mid-point callback) */
+  tl.add(function(){ if(cb){ cb(); cb=null; } }, '+=.08');
+
+  /* 4. Logo pops out */
+  tl.to(logoMid, {
+    scale: 0, opacity: 0, rotation: 180,
+    duration: .24, ease: 'back.in(2)'
+  });
+
+  /* 5. Stripes sweep OUT (right→left), staggered */
+  tl.to(stripes, {
+    scaleX: 0,
+    transformOrigin: 'right center',
+    duration: .44,
+    ease: 'power3.inOut',
+    stagger: {amount:.16, from:'end'}
+  }, '-=.12');
+}
+
+/* ENTER animation on first page load */
+function playEnterOnLoad(){
+  /* Start: stripes fully covering screen, logo visible */
+  gsap.set(stripes, {scaleX:1, transformOrigin:'right center'});
+  gsap.set(logoMid, {scale:1, opacity:1, rotation:0, xPercent:-50, yPercent:-50});
+
+  var tl = gsap.timeline();
+
+  /* Logo pulse */
+  tl.to(logoMid, {scale:1.18, duration:.22, ease:'back.out(2)', yoyo:true, repeat:1});
+
+  /* Stripes sweep OUT revealing the page */
+  tl.to(stripes, {
+    scaleX: 0,
+    duration: .52,
+    ease: 'power3.inOut',
+    stagger: {amount:.20, from:'start'}
+  }, '-=.08');
+
+  /* Logo exits */
+  tl.to(logoMid, {
+    scale: 0, opacity: 0, rotation: -180,
+    duration: .24, ease: 'back.in(2)'
+  }, '-=.40');
+}
+
+/* Particle burst */
+function particles(x, y){
+  if(typeof gsap === 'undefined') return;
+  var cols = ['#8b5cf6','#22d3ee','#f472b6','#6d28d9','#fff','#fde047'];
+  for(var i = 0; i < 14; i++){
+    var el = document.createElement('div');
+    el.className = 'ua-particle';
+    var sz  = 4 + Math.random()*8;
+    var ang = (Math.PI*2*i/14) + (Math.random()-.5)*.6;
+    var d   = 50 + Math.random()*70;
+    el.style.cssText = 'left:'+x+'px;top:'+y+'px;width:'+sz+'px;height:'+sz+'px;background:'+cols[i%cols.length]+';transform:translate(-50%,-50%);';
+    document.body.appendChild(el);
+    gsap.to(el, {
+      x: Math.cos(ang)*d, y: Math.sin(ang)*d,
+      opacity: 0, scale: 0,
+      duration: .55 + Math.random()*.3,
+      ease: 'power2.out',
+      onComplete: function(){ this.targets()[0].remove(); }
+    });
+  }
+}
+
+/* ══ TAB NAVIGATION ══ */
+var curTab = 'lf';
+
+function goTab(id, px, py){
+  if(id === curTab) return;
+  if(transitioning) return;
+
+  /* Particle burst at click origin */
+  particles(
+    px !== undefined ? px : window.innerWidth/2,
+    py !== undefined ? py : 80
+  );
+
+  playTransition(function(){
+    /* Swap active page */
+    document.getElementById('page-'+curTab).classList.remove('active');
+    document.getElementById('page-'+id).classList.add('active');
+    /* Swap active tab */
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    document.getElementById('tab-'+id).classList.add('active');
+    /* Scroll top */
+    window.scrollTo({top:0,behavior:'instant'});
+    curTab = id;
+    /* Init chat */
+    if(id === 'ai' && document.getElementById('chat-msgs').children.length === 0) buildWelcome();
+  });
+}
+
+/* Wire tabs */
+document.querySelectorAll('.tab').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    var id = btn.id.replace('tab-','');
+    var r  = btn.getBoundingClientRect();
+    goTab(id, r.left+r.width/2, r.top+r.height/2);
+  });
+});
+document.getElementById('logo-home').addEventListener('click', function(e){
+  var r = e.currentTarget.getBoundingClientRect();
+  goTab('lf', r.left+r.width/2, r.top+r.height/2);
+});
+document.getElementById('sos-btn').addEventListener('click', function(e){
+  var r = e.currentTarget.getBoundingClientRect();
+  goTab('em', r.left+r.width/2, r.top+r.height/2);
+});
+
+/* ══ LOST & FOUND ══ */
+var curF='all';
+function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s||''));return d.innerHTML;}
+function toast(m,t){var el=document.createElement('div');el.className='toast '+(t||'tok');el.textContent=m;document.body.appendChild(el);setTimeout(function(){el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(function(){el.remove();},320);},2500);}
+function getLF(){return JSON.parse(localStorage.getItem('ua_lf'))||[];}
+function saveLF(a){localStorage.setItem('ua_lf',JSON.stringify(a));}
+function renderLF(){
+  var q=(document.getElementById('lf-search').value||'').trim().toLowerCase();
+  var items=getLF();
+  if(curF!=='all') items=items.filter(function(i){return i.type===curF;});
+  if(q) items=items.filter(function(i){return i.name.toLowerCase().includes(q)||i.location.toLowerCase().includes(q);});
+  var c=document.getElementById('items-grid');
+  if(!items.length){c.innerHTML='<div class="empty"><div class="empty-ico">📦</div><h3>No Items Found</h3><p>Be the first to post!</p></div>';return;}
+  c.innerHTML=items.map(function(i){return '<div class="ic '+i.type+'"><div class="ic-hd"><span class="bdg bdg-'+i.type+'">'+i.type+'</span><button class="delbtn" onclick="delLF('+i.id+')">✕</button></div><h3>'+esc(i.name)+'</h3><div class="imeta"><span>📍 '+esc(i.location)+'</span><span>📞 '+esc(i.contact)+'</span><span>📅 '+i.date+'</span>'+(i.description?'<span>📝 '+esc(i.description)+'</span>':'')+'</div></div>';}).join('');
+}
+function setF(t){curF=t;document.querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});document.getElementById('f-'+t).classList.add('on');renderLF();}
+function delLF(id){if(!confirm('Delete this item?'))return;saveLF(getLF().filter(function(i){return i.id!==id;}));toast('🗑 Item removed','tok');renderLF();}
+document.getElementById('lf-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  var item={id:Date.now(),type:document.getElementById('lf-type').value,name:document.getElementById('lf-name').value.trim(),location:document.getElementById('lf-loc').value.trim(),contact:document.getElementById('lf-con').value.trim(),description:document.getElementById('lf-desc').value.trim(),date:new Date().toLocaleDateString()};
+  var arr=getLF();arr.unshift(item);saveLF(arr);this.reset();toast('✅ Item posted!','tok');renderLF();
+});
+document.getElementById('lf-search').addEventListener('input',renderLF);
+renderLF();
+
+/* ══ COMPLAINTS ══ */
+var catCls={facilities:'cf',academic:'ca',safety:'cs',harassment:'ch',other:'co'};
+function getComp(){return JSON.parse(localStorage.getItem('ua_comp'))||[];}
+function saveComp(a){localStorage.setItem('ua_comp',JSON.stringify(a));}
+function renderComp(){
+  var arr=getComp(),c=document.getElementById('comp-list');
+  if(!arr.length){c.innerHTML='<div class="empty" style="grid-column:unset;"><div class="empty-ico">📝</div><h3>No Complaints Yet</h3><p>Submitted complaints appear here.</p></div>';return;}
+  c.innerHTML=arr.map(function(i){return '<div class="cc"><div class="cc-hd"><span class="cbdg '+(catCls[i.category]||'co')+'">'+i.category.toUpperCase()+'</span><button class="delbtn" onclick="delComp('+i.id+')">✕</button></div><h4>'+esc(i.subject)+'</h4><p>'+esc(i.details)+'</p><div class="cc-ft"><span>📅 '+i.date+'</span><span>🕐 '+i.time+'</span></div></div>';}).join('');
+}
+function delComp(id){if(!confirm('Delete?'))return;saveComp(getComp().filter(function(c){return c.id!==id;}));toast('🗑 Deleted','tok');renderComp();}
+document.getElementById('comp-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  var c={id:Date.now(),category:document.getElementById('cc').value,subject:document.getElementById('cs').value.trim(),details:document.getElementById('cd').value.trim(),date:new Date().toLocaleDateString(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
+  var arr=getComp();arr.unshift(c);saveComp(arr);this.reset();toast('🔒 Submitted anonymously!','tok');
+  var v=document.getElementById('comp-view');if(v.style.display!=='none')renderComp();
+});
+document.getElementById('tog-btn').addEventListener('click',function(){
+  var v=document.getElementById('comp-view');var open=v.style.display==='none'||v.style.display==='';
+  v.style.display=open?'block':'none';this.textContent=open?'Hide':'Show';if(open)renderComp();
+});
+
+/* ══ CHATBOT ══ */
+var chatHistory=[],chatBusy=false;
+var SYS='You are UniAssist AI, a friendly campus assistant. Be warm, helpful, concise, use occasional emojis. UniAssist has: 1) Lost & Found - post/find items. 2) Anonymous Complaints - Facilities, Academic, Safety, Harassment, Other. 3) Emergency - Ambulance 108, Police 100, Fire 101, Women Helpline 181. Help with campus life, study tips, exam stress. Keep replies to 2-4 short paragraphs or bullets.';
+function fmtReply(t){
+  if(!t)return'<p>Sorry, try again!</p>';
+  t=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.*?)\*/g,'<em>$1</em>');
+  t=t.replace(/^\d+\.\s+(.+)$/gm,'<li>$1</li>');
+  t=t.replace(/^[-•]\s+(.+)$/gm,'<li>$1</li>');
+  t=t.replace(/(<li>[\s\S]*?<\/li>\n?)+/g,function(m){return'<ul>'+m+'</ul>';});
+  t=t.replace(/\n\n+/g,'</p><p>');t=t.replace(/\n/g,'<br>');
+  return'<p>'+t+'</p>';
+}
+function localReply(q){
+  var t=q.toLowerCase();
+  if(t.match(/lost|found|item|missing/))return'📦 **Lost & Found** — Click the Lost & Found tab and fill in the Post form with item name, location, and contact info. It appears instantly!\n\nUse the search or filters to find specific items.';
+  if(t.match(/complaint|report|issue|problem/))return'📝 **Anonymous Complaints** — Go to Complaints tab, select a category, fill in subject and details, then submit anonymously.\n\n🔒 Your identity is 100% protected.';
+  if(t.match(/emergency|ambulance|police|fire|helpline|number/))return'🚨 **Emergency Numbers:**\n- 🚑 Ambulance: **108**\n- 🚓 Police: **100**\n- 🚒 Fire: **101**\n- 👩 Women Helpline: **181**\n- Campus Security & Medical on Emergency tab!';
+  if(t.match(/stress|anxious|exam|study|pressure/))return'💙 **You\'ve got this!**\n- Pomodoro: 45 min study, 10 min break\n- Deep breathing: 4 in, hold 4, out 4\n- Sleep & meals matter!\n- Talk to someone — mentor or counselor\n\nYou are more capable than you think! 🌟';
+  if(t.match(/dark|light|mode|theme/))return'🌙 Click the ☀️/🌙 button in the top-right to toggle dark/light mode. Saved automatically!';
+  if(t.match(/^(hi|hello|hey|sup|hii)[\s!?]*$/))return'👋 **Hey! I\'m UniAssist AI!**\n\nI can help with:\n- 📦 Lost & Found\n- 📝 Anonymous Complaints\n- 🚨 Emergency contacts\n- 📚 Study & campus life tips\n\nWhat do you need? 😊';
+  return'🤔 I\'m UniAssist AI! I can help with:\n\n- **Lost & Found** — post or search items\n- **Complaints** — submit anonymously\n- **Emergency** — all campus contacts\n- **Campus life** — study tips, stress, safety\n\nTell me more! 😊';
+}
+function addMsg(role,html){var w=document.getElementById('chat-msgs');var d=document.createElement('div');d.className='cmsg '+role;d.innerHTML='<div class="mav">'+(role==='bot'?'🤖':'👤')+'</div><div class="mbub">'+html+'</div>';w.appendChild(d);w.scrollTop=w.scrollHeight;}
+function showTyping(){var w=document.getElementById('chat-msgs');var d=document.createElement('div');d.className='cmsg bot';d.id='typing';d.innerHTML='<div class="mav">🤖</div><div class="mbub"><div class="typing-dots"><span></span><span></span><span></span></div></div>';w.appendChild(d);w.scrollTop=w.scrollHeight;}
+function hideTyping(){var e=document.getElementById('typing');if(e)e.remove();}
+async function sendChat(){
+  var inp=document.getElementById('ci');var text=inp.value.trim();
+  if(!text||chatBusy)return;
+  var wlc=document.getElementById('chat-welcome');if(wlc)wlc.style.display='none';
+  inp.value='';inp.style.height='auto';
+  addMsg('user',esc(text));chatHistory.push({role:'user',content:text});
+  chatBusy=true;document.getElementById('sb').disabled=true;showTyping();
+  try{
+    var messages=[{role:'system',content:SYS}].concat(chatHistory);
+    var prompt=messages.map(function(m){return m.role+': '+m.content;}).join('\n\n')+'\n\nassistant:';
+    var ctrl=new AbortController();var tout=setTimeout(function(){ctrl.abort();},14000);
+    var res=await fetch('https://text.pollinations.ai/'+encodeURIComponent(prompt),{signal:ctrl.signal});
+    clearTimeout(tout);
+    if(!res.ok)throw new Error('err');
+    var reply=(await res.text()).trim().replace(/^assistant:\s*/i,'').trim();
+    if(!reply||reply.length<3)throw new Error('empty');
+    hideTyping();addMsg('bot',fmtReply(reply));chatHistory.push({role:'assistant',content:reply});
+  }catch(err){
+    hideTyping();var fb=localReply(text);addMsg('bot',fmtReply(fb));chatHistory.push({role:'assistant',content:fb});
+  }
+  chatBusy=false;document.getElementById('sb').disabled=false;
+}
+function quickSend(t){document.getElementById('ci').value=t;sendChat();}
+function buildWelcome(){
+  var w=document.getElementById('chat-msgs');
+  w.innerHTML='<div id="chat-welcome" class="chat-welcome"><div class="welcome-emoji">🎓</div><h3>Hi! I\'m UniAssist AI</h3><p>Your smart campus companion — ask me anything!</p><div class="wchips"><button class="chip" onclick="quickSend(\'How do I report a lost item?\')">📦 Lost item</button><button class="chip" onclick="quickSend(\'How to file a complaint?\')">📝 Complaint</button><button class="chip" onclick="quickSend(\'Emergency contact numbers?\')">🚨 Emergency</button><button class="chip" onclick="quickSend(\'Tips for exam stress?\')">📚 Exam tips</button><button class="chip" onclick="quickSend(\'What features does UniAssist have?\')">✨ Features</button><button class="chip" onclick="quickSend(\'Campus safety tips?\')">🛡️ Safety</button></div></div>';
+  chatHistory=[];
+}
+document.getElementById('sb').addEventListener('click',sendChat);
+document.getElementById('clr-btn').addEventListener('click',buildWelcome);
+document.getElementById('ci').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+document.getElementById('ci').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
+buildWelcome();
+
+/* ══ INIT — wait for GSAP then fire enter animation ══ */
+(function(){
+  function waitGSAP(cb){if(typeof gsap!=='undefined')cb();else setTimeout(function(){waitGSAP(cb);},30);}
+  waitGSAP(function(){
+    initTransitions();
+    playEnterOnLoad();   /* 🎬 fires the U logo + stripe reveal on first load */
+  });
+})();
+</script>
+</body>
+</html>
